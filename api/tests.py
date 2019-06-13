@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 from .models import Bucketlist
 from rest_framework.test import APIClient
@@ -19,7 +20,8 @@ class ModelTestCase(TestCase):
         Define the test client and other test variables.
         """
         self.bucketlist_name: str = "Write world class code"
-        self.bucketlist: Bucketlist = Bucketlist(name=self.bucketlist_name)
+        self.user = User.objects.create(username="nerd")
+        self.bucketlist: Bucketlist = Bucketlist(name=self.bucketlist_name, owner=self.user)
 
     def test_model_can_create_a_bucklist(self):
         """
@@ -39,8 +41,13 @@ class ViewTestCase(TestCase):
 
     def setUp(self) -> None:
         """Define the test client and other test variables."""
+        user = User.objects.create(username="nerd")
+
         self.client: APIClient = APIClient()
-        self.bucketlist_data: dict = {'name': "Go to ibiza"}
+        self.client.force_authenticate(user=user)
+
+        # Since user model instance is not serializable, use its Id/PK
+        self.bucketlist_data: dict = {'name': "Go to ibiza", "owner": user.id}
 
         self.response = self.client.post(
             reverse('create'),
