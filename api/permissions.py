@@ -4,7 +4,7 @@ from .models import Bucketlist
 
 class IsOwner(BasePermission):
     """
-    Custom permisson class to allow only bucketlist owners to edit them
+    Custom permissions class to allow only bucketlist owners to edit them
     """
 
     def has_object_permission(self, request, view, obj) -> bool:
